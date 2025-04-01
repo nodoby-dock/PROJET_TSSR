@@ -24,7 +24,7 @@ function Show-Menu {
     Write-Host "============================================="
     Write-Host "1 - Changement du nom et/ou rejoindre un domaine"
     Write-Host "2 - Installation d'un contrôleur de domaine (DC)"
-    Write-Host "3 - Importation des utilisateur"
+    Write-Host "3 - Importation des utilisateurs"
     Write-Host "4 - Fonctionnalité à implémenter"
     Write-Host "..."
     Write-Host "9 - Désactiver l'exécution automatique au démarrage"

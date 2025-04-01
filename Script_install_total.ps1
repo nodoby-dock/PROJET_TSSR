@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Définition du chemin du raccourci de démarrage automatique
 $StartupPath = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\server_setup.lnk"
 
@@ -17,6 +18,9 @@ if (-not (Test-Path $StartupPath)) {
 }
 
 # Fonction pour afficher le menu
+=======
+# Menu principal
+>>>>>>> 98165b8aeacff72baef04185a0b0fc7316885ebb
 function Show-Menu {
     Clear-Host
     Write-Host "============================================="
@@ -26,28 +30,44 @@ function Show-Menu {
     Write-Host "2 - Installation d'un contrôleur de domaine (DC)"
     Write-Host "3 - Option supplémentaire (placeholder)"
     Write-Host "..."
+<<<<<<< HEAD
     Write-Host "9 - Désactiver l'exécution automatique au démarrage"
+=======
+>>>>>>> 98165b8aeacff72baef04185a0b0fc7316885ebb
     Write-Host "0 - Quitter"
     Write-Host "============================================="
 }
 
 do {
     Show-Menu
+<<<<<<< HEAD
     $choice = Read-Host "Choisissez une option (1-3, 9 pour désactiver l'auto-lancement, 0 pour quitter)"
+=======
+    $choice = Read-Host "Choisissez une option (1-3 ou 0 pour quitter)"
+>>>>>>> 98165b8aeacff72baef04185a0b0fc7316885ebb
 
     switch ($choice) {
         "1" {
             Write-Host "Exécution du script de renommage et d'ajout au domaine..."
+<<<<<<< HEAD
             Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$PSScriptRoot\Name&group.ps1`"" -NoNewWindow -Wait
         }
         "2" {
             Write-Host "Exécution du script d'installation du contrôleur de domaine..."
             Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$PSScriptRoot\DC_creation.ps1`"" -NoNewWindow -Wait
+=======
+            Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File .\Name&group.ps1" -NoNewWindow -Wait
+        }
+        "2" {
+            Write-Host "Exécution du script d'installation du contrôleur de domaine..."
+            Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File .\DC_creation.ps1" -NoNewWindow -Wait
+>>>>>>> 98165b8aeacff72baef04185a0b0fc7316885ebb
         }
         "3" {
             Write-Host "Fonctionnalité à implémenter..."
             Start-Sleep 2
         }
+<<<<<<< HEAD
         "9" {
             Write-Host "Désactivation de l'exécution automatique..."
             if (Test-Path $StartupPath) {
@@ -66,6 +86,14 @@ do {
         default {
             Write-Host "Option invalide, veuillez choisir une option valide."
             Start-Sleep 2
+=======
+        "0" {
+            Write-Host "Quitter..."
+            break
+        }
+        default {
+            Write-Host "Option invalide, veuillez choisir une option valide."
+>>>>>>> 98165b8aeacff72baef04185a0b0fc7316885ebb
         }
     }
 } while ($true)

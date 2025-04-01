@@ -1,5 +1,21 @@
 # Projet TSSR 🚀
 Script & autre joyeuseté réalisé lors du parcours TSSR au CEFIM.
+## Importer cd repo 
+$repo = "nodoby-dock/PROJET_TSSR"
+>> $zipUrl = "https://github.com/$repo/archive/refs/heads/main.zip"
+>> $zipFile = "projet-test.zip"
+>> $destinationPath = "C:/Scripts/projet-test"
+>>
+>> # Supprime le dossier s'il existe
+>> Remove-Item -Path $destinationPath -Recurse -Force -ErrorAction SilentlyContinue
+>>
+>> # Télécharge et extrait l'archive
+>> Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
+>> Expand-Archive -Path $zipFile -DestinationPath $destinationPath -Force
+>>
+>> # Supprime l'archive ZIP
+>> Remove-Item -Path $zipFile -Force
+>>
 ## Script powershell ⚙️
 Le script "_Script_install_total" propose d'executer les scripts ci dessous.
 

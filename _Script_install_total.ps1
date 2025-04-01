@@ -50,6 +50,7 @@ do {
         "1" {
             Write-Host "Exécution du script de renommage et d'ajout au domaine..."
 <<<<<<< HEAD
+<<<<<<< HEAD:_Script_install_total.ps1
             Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$PSScriptRoot\1-Name&group.ps1`"" -NoNewWindow -Wait
         }
         "2" {
@@ -61,6 +62,19 @@ do {
         "2" {
             Write-Host "Exécution du script d'installation du contrôleur de domaine..."
             Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File .\2-DC_creation.ps1" -NoNewWindow -Wait
+=======
+            Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$PSScriptRoot\Name&group.ps1`"" -NoNewWindow -Wait
+        }
+        "2" {
+            Write-Host "Exécution du script d'installation du contrôleur de domaine..."
+            Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$PSScriptRoot\DC_creation.ps1`"" -NoNewWindow -Wait
+=======
+            Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File .\Name&group.ps1" -NoNewWindow -Wait
+        }
+        "2" {
+            Write-Host "Exécution du script d'installation du contrôleur de domaine..."
+            Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File .\DC_creation.ps1" -NoNewWindow -Wait
+>>>>>>> eec7dad05e4bea48f20d3ccdcfca8b2846d5a8ef:Script_install_total.ps1
 >>>>>>> 98165b8aeacff72baef04185a0b0fc7316885ebb
         }
         "3" {

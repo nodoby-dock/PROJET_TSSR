@@ -1,6 +1,6 @@
 # Projet TSSR 🚀
 Script & autre joyeuseté réalisé lors du parcours TSSR au CEFIM.
-## Importer cd repo 
+## Importer ce repo 
 ```
 $repo = "nodoby-dock/PROJET_TSSR"
 >> $zipUrl = "https://github.com/$repo/archive/refs/heads/main.zip"
@@ -17,7 +17,11 @@ $repo = "nodoby-dock/PROJET_TSSR"
 >> # Supprime l'archive ZIP
 >> Remove-Item -Path $zipFile -Force 
 ```
-## Script powershell ⚙️
+# *WinServ-DC* ⚙️
+## L'outil parfait pour installer et populate un DC
+
+### Son fonctionnement : 
+
 Le script "_Script_install_total" propose d'executer les scripts ci dessous.
 
 Lors de son lancement manuel il créera un raccourci dans le dossier Startup afin de s'éxécuter apres chaque rédémarrage.

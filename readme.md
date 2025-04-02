@@ -48,4 +48,4 @@ Spécial dédicace à la chauve-souris haricot
 
 (avec de l'imagination ça passe)
 
-git add Asset/tst.png
+![Texte alternatif](Asset/tst.png.png)

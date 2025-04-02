@@ -1,8 +1,22 @@
-# Demander les entrées 
-$CsvPath = Read-Host "Entrez le chemin du fichier CSV"
+# Vérifier si "users.csv" est présent dans le dossier du script
+$ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$DefaultCsvPath = "$ScriptPath\users.csv"
+
+if (Test-Path $DefaultCsvPath) {
+    $UseDefault = Read-Host "Un fichier 'users.csv' a été détecté dans le dossier du script. Voulez-vous l'utiliser ? (oui/non)"
+    if ($UseDefault -match "[Oo]") {
+        $CsvPath = $DefaultCsvPath
+    } else {
+        $CsvPath = Read-Host "Entrez le chemin du fichier CSV"
+    }
+} else {
+    $CsvPath = Read-Host "Entrez le chemin du fichier CSV"
+}
+
+# Demander les autres entrées
 $TargetOU = Read-Host "Entrez l'OU cible dans Active Directory"
 $DryRun = Read-Host "Exécuter en mode simulation ? (oui/non)"
-$DryRun = $DryRun -eq "oui"
+$DryRun = $DryRun -match "[Oo]"
 
 # Mot de passe par défaut
 $defaultPassword = "P@ssw0rd123"

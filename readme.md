@@ -23,7 +23,7 @@ Lors de son lancement manuel il créera un raccourci dans le dossier Startup afi
 📍 Press "9" pour annuler cet option.
 
 
-1️⃣ 1-Name&group : Renomme le poste & propose de rejoindre un domaine si nécessaire
+1️⃣ 1-Name&group : Renomme le poste, propose de rejoindre un domaine si nécessaire & vérifie l'adresse IP de la machine
 
 2️⃣2-DC_creation : Installation d'un DC et promotion en tant que contrôleur
 

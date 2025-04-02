@@ -27,7 +27,7 @@ Lors de son lancement manuel il créera un raccourci dans le dossier Startup afi
 
 2️⃣2-DC_creation : Installation d'un DC et promotion en tant que contrôleur
 
-3️⃣3-import_user : pour un import user depuis un fichier CSV vers un AD 
+3️⃣3-import_user : Choix multiple permettant de généré des OUs et/ou de généré des utilisateurs, chacun à l'aide d'un fichier CSV qui doit être présent dans le dossier de lancement du script (ou alors un prompt demandera le chemin du script)
 
 
 #

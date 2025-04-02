@@ -48,5 +48,6 @@ Spécial dédicace à la chauve-souris haricot
 
 (avec de l'imagination ça passe)
 
-![Image ajoutée](Asset/tst.png)
-
+<p align="center">
+  <img src="https://github.com/nodoby-dock/PROJET_TSSR/blob/f2619e56dd9e13fe894bc3c5b4568f0550199ba4/Asset/tst.png" alt="Image ajoutée">
+</p>

@@ -1,0 +1,7 @@
+OUName,ParentOU
+EXAMPLE,DC=example,DC=com
+PERSONNEL,OU=EXAMPLE,DC=example,DC=com
+SERVICE,OU=EXAMPLE,DC=example,DC=com
+IT,OU=SERVICE,OU=EXAMPLE,DC=example,DC=com
+HR,OU=SERVICE,OU=EXAMPLE,DC=example,DC=com
+Finance,OU=SERVICE,OU=EXAMPLE,DC=example,DC=com

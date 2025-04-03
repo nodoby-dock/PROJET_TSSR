@@ -1,48 +1,61 @@
-# Affichage du nom actuel du serveur
-Write-Host "Nom actuel du serveur : $env:COMPUTERNAME"
-$ConfirmName = Read-Host "Le nom est-il correct ? (O/N)"
+# Vérifier si la machine est déjà membre d'un domaine
+$CurrentDomain = (Get-WmiObject Win32_ComputerSystem).Domain
 
-# Si le nom n'est pas correct, demander un nouveau nom
-if ($ConfirmName -match "[Nn]") {
-    $ServerName = Read-Host "Entrez le nouveau nom du serveur"
-    Write-Host "Renommage du serveur en $ServerName..."
-    Rename-Computer -NewName $ServerName -Force
-    Write-Host "Renommage terminé. Redémarrage en cours..."
-    Restart-Computer -Force
-    exit
-}
-
-# Demande des informations pour le domaine
-$DomainName = Read-Host "Entrez le nom de domaine (ex: mondomaine.local)"
-$NetBiosName = Read-Host "Entrez le nom NetBIOS du domaine (ex: MONDOMAINE)"
-$SafeModePassword = Read-Host "Entrez le mot de passe du mode sans échec AD (Doit être fort)" -AsSecureString
-
-# Vérifier si le module ADDSDeployment est disponible
-if (-not (Get-Module -ListAvailable -Name ADDSDeployment)) {
-    Write-Host "Le module ADDSDeployment est introuvable. Installation du rôle ADDS..."
-    Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
-}
-
-# Vérifier si un contrôleur de domaine existe déjà dans le réseau
-$DCs = Get-ADDomainController -ErrorAction SilentlyContinue
-
-if ($DCs) {
-    Write-Host "Un contrôleur de domaine existe déjà. Ajout en tant que DC supplémentaire..."
-    Install-ADDSDomainController `
-        -DomainName $DomainName `
-        -SafeModeAdministratorPassword $SafeModePassword `
-        -InstallDNS `
-        -Force
+if ($CurrentDomain -eq $env:COMPUTERNAME) {
+    Write-Host "Aucun domaine trouvé, création d'un nouveau domaine..."
+    $NewDomain = $true
 } else {
-    Write-Host "Aucun DC trouvé. Création d'un nouveau domaine..."
+    Write-Host "La machine semble déjà dans un domaine ($CurrentDomain), vérification des DC existants..."
+    try {
+        $DCs = Get-ADDomainController -ErrorAction Stop
+        $NewDomain = $false
+    } catch {
+        Write-Host "Impossible de contacter un DC, création d'un nouveau domaine..."
+        $NewDomain = $true
+    }
+}
+
+# Si aucun DC n'existe, on crée un nouveau domaine
+if ($NewDomain) {
+    $DomainName = Read-Host "Entrez le nom de domaine (ex: mondomaine.local)"
+    $NetBiosName = Read-Host "Entrez le nom NetBIOS du domaine (ex: MONDOMAINE)"
+    
+    # Vérification du mot de passe admin
+    do {
+        $SafeModePassword = Read-Host "Entrez le mot de passe du mode sans échec AD (Doit être fort)" -AsSecureString
+        $ConfirmPassword = Read-Host "Confirmez le mot de passe" -AsSecureString
+        
+        if (-not (Compare-SecureString $SafeModePassword $ConfirmPassword)) {
+            Write-Host "Les mots de passe ne correspondent pas. Veuillez réessayer." -ForegroundColor Red
+        }
+    } while (-not (Compare-SecureString $SafeModePassword $ConfirmPassword))
+
+    # Installation du rôle ADDS
+    Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+    # Création du domaine
     Install-ADDSForest `
         -DomainName $DomainName `
         -DomainNetbiosName $NetBiosName `
         -SafeModeAdministratorPassword $SafeModePassword `
         -InstallDNS `
         -Force
+} else {
+    Write-Host "Ajout en tant que DC secondaire dans le domaine $CurrentDomain..."
+    
+    Install-ADDSDomainController `
+        -DomainName $CurrentDomain `
+        -SafeModeAdministratorPassword $SafeModePassword `
+        -InstallDNS `
+        -Force
 }
 
-# Redémarrer après installation
+# Redémarrage après installation
 Write-Host "Installation terminée. Redémarrage en cours..."
 Restart-Computer -Force
+
+# Fonction pour comparer deux SecureString
+function Compare-SecureString($String1, $String2) {
+    return (New-Object PSCredential "user", $String1).GetNetworkCredential().Password -eq `
+           (New-Object PSCredential "user", $String2).GetNetworkCredential().Password
+}

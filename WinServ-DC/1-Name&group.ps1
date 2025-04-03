@@ -15,7 +15,6 @@ if ($CurrentDomain -eq $env:COMPUTERNAME -and $JoinDomain -match "[Oo]") {
     $User = Read-Host "Entrez un compte autorisé pour l'ajout au domaine (ex: Administrateur)"
     $Password = Read-Host "Entrez le mot de passe de $User" -AsSecureString
 
-    # Tenter de joindre le domaine
     try {
         Add-Computer -DomainName $DomainName -Credential (New-Object PSCredential "$DomainName\$User", $Password) -Force
         Write-Host "L'ordinateur a été ajouté au domaine."
@@ -38,9 +37,16 @@ if ($Interface) {
             $SetStatic = Read-Host "Voulez-vous configurer une IP statique ? (O/N)"
             if ($SetStatic -match "[Oo]") {
                 $IpAddress = Read-Host "Entrez l'adresse IP (ex: 192.168.1.100)"
-                $SubnetMask = Read-Host "Entrez le masque de sous-réseau (ex: 255.255.255.0)"
+                $SubnetMask = Read-Host "Entrez le masque de sous-réseau (ex: /24)"
                 $Gateway = Read-Host "Entrez la passerelle (ex: 192.168.1.1)"
                 $Dns = Read-Host "Entrez le(s) serveur(s) DNS séparés par une virgule (ex: 8.8.8.8,8.8.4.4)"
+                
+                $ExistingIP = Get-NetIPAddress -InterfaceIndex $Adapter.ifIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue
+                if ($ExistingIP) {
+                    Write-Host "Une adresse IP statique existe déjà : $($ExistingIP.IPAddress), suppression en cours..."
+                    Remove-NetIPAddress -InterfaceIndex $Adapter.ifIndex -AddressFamily IPv4 -Confirm:$false -ErrorAction SilentlyContinue
+                    Start-Sleep -Seconds 2
+                }
                 
                 try {
                     New-NetIPAddress -InterfaceIndex $Adapter.ifIndex -IPAddress $IpAddress -PrefixLength ($SubnetMask -split "\.")[0] -DefaultGateway $Gateway
@@ -56,9 +62,16 @@ if ($Interface) {
             $KeepStatic = Read-Host "Voulez-vous la garder ? (O/N)"
             if ($KeepStatic -match "[Nn]") {
                 $IpAddress = Read-Host "Entrez la nouvelle adresse IP (ex: 192.168.1.100)"
-                $SubnetMask = Read-Host "Entrez le masque de sous-réseau (ex: 255.255.255.0)"
+                $SubnetMask = Read-Host "Entrez le masque de sous-réseau CIDR (ex: /24)"
                 $Gateway = Read-Host "Entrez la passerelle (ex: 192.168.1.1)"
                 $Dns = Read-Host "Entrez le(s) serveur(s) DNS séparés par une virgule (ex: 8.8.8.8,8.8.4.4)"
+                
+                $ExistingIP = Get-NetIPAddress -InterfaceIndex $Adapter.ifIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue
+                if ($ExistingIP) {
+                    Write-Host "Une adresse IP statique existe déjà : $($ExistingIP.IPAddress), suppression en cours..."
+                    Remove-NetIPAddress -InterfaceIndex $Adapter.ifIndex -AddressFamily IPv4 -Confirm:$false -ErrorAction SilentlyContinue
+                    Start-Sleep -Seconds 2
+                }
                 
                 try {
                     New-NetIPAddress -InterfaceIndex $Adapter.ifIndex -IPAddress $IpAddress -PrefixLength ($SubnetMask -split "\.")[0] -DefaultGateway $Gateway
@@ -79,6 +92,6 @@ if ($Interface) {
 }
 
 # Pause avant redémarrage forcé
-Write-Host "`nAppuyez sur une touche pour redémarrer..."
+Write-Host "\nAppuyez sur une touche pour redémarrer..."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 Restart-Computer -Force

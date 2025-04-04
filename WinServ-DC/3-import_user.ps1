@@ -1,4 +1,43 @@
-# Menu de sélection
+function Ensure-OUPath {
+    param (
+        [string]$FullPath
+    )
+
+    # Si l'OU existe déjà, on ne fait rien
+    if (Get-ADOrganizationalUnit -LDAPFilter "(distinguishedName=$FullPath)" -ErrorAction SilentlyContinue) {
+        return
+    }
+
+    # On coupe le chemin en morceaux (en partant du plus bas)
+    $components = $FullPath -split '(?<!\\),'
+    $dnList = @()
+
+    for ($i = $components.Length - 1; $i -ge 0; $i--) {
+        $dn = ($components[$i..($components.Length - 1)] -join ',')
+
+        # On ne traite que les DN qui commencent par "OU="
+        if ($dn -like 'OU=*') {
+            $dnList += $dn
+        }
+    }
+
+    # On part du haut vers le bas
+    foreach ($dn in ($dnList | Sort-Object Length)) {
+        if (-not (Get-ADOrganizationalUnit -LDAPFilter "(distinguishedName=$dn)" -ErrorAction SilentlyContinue)) {
+            $ouName = ($dn -split '(?<!\\),')[0] -replace '^OU='
+            $ouPath = ($dn -replace '^OU=[^,]+,')  # retire le premier segment pour obtenir le parent
+
+            try {
+                New-ADOrganizationalUnit -Name $ouName -Path $ouPath -ProtectedFromAccidentalDeletion $true
+                Write-Host "OU $dn créée avec succès." -ForegroundColor Green
+            } catch {
+                Write-Host "Erreur lors de la création de l'OU $dn. Détails : $_" -ForegroundColor Red
+            }
+        }
+    }
+}
+
+# === MENU PRINCIPAL ===
 do {
     Clear-Host
     Write-Host "Que voulez-vous faire ?"
@@ -8,11 +47,9 @@ do {
     $Choice = Read-Host "Entrez votre choix (1/2/3)"
 
     switch ($Choice) {
-        1 { 
-            # ==== CRÉATION DES OUs ====
+        1 {
             Write-Host "`n--- Création des OUs ---"
 
-            # Vérifier si "ous.csv" est présent dans le dossier du script
             $ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
             $DefaultCsvPath = "$ScriptPath\ous.csv"
 
@@ -27,38 +64,31 @@ do {
                 $CsvPath = Read-Host "Entrez le chemin du fichier CSV des OU"
             }
 
-            # Vérifier le module ActiveDirectory
+            if (-not (Test-Path $CsvPath)) {
+                Write-Host "Le fichier CSV spécifié n'existe pas." -ForegroundColor Red
+                exit 1
+            }
+
             if (-not (Get-Module -ListAvailable -Name ActiveDirectory)) {
-                Write-Host "Le module ActiveDirectory n'est pas installé."
+                Write-Host "Le module Active Directory n'est pas installé." -ForegroundColor Red
                 exit 1
             }
             Import-Module ActiveDirectory
 
-            # Vérifier l'existence du fichier CSV
-            if (-not (Test-Path $CsvPath)) {
-                Write-Host "Le fichier CSV spécifié n'existe pas."
-                exit 1
-            }
+            $DryRun = Read-Host "Exécuter en mode simulation ? (oui/non)"
+            $DryRun = $DryRun -match "[Oo]"
 
             $ous = Import-Csv -Path $CsvPath
 
-            # Création des OUs
             foreach ($ou in $ous) {
                 $OUName = $ou.OUName
                 $ParentOU = $ou.ParentOU
                 $OUPath = "OU=$OUName,$ParentOU"
 
-                # Vérifier si l'OU existe déjà
-                $existingOU = Get-ADOrganizationalUnit -Filter { DistinguishedName -eq $OUPath } -ErrorAction SilentlyContinue
-                if ($existingOU) {
-                    Write-Host "L'OU $OUName existe déjà."
+                if ($DryRun) {
+                    Write-Host "[Simulation] Création de l'OU : $OUPath" -ForegroundColor Cyan
                 } else {
-                    try {
-                        New-ADOrganizationalUnit -Name $OUName -Path $ParentOU -ProtectedFromAccidentalDeletion $true
-                        Write-Host "OU $OUName créée avec succès dans $ParentOU."
-                    } catch {
-                        Write-Host "Erreur lors de la création de l'OU $OUName."
-                    }
+                    Ensure-OUPath -FullPath $OUPath
                 }
             }
 
@@ -67,10 +97,8 @@ do {
         }
 
         2 {
-            # ==== IMPORT DES UTILISATEURS ====
             Write-Host "`n--- Import des utilisateurs ---"
 
-            # Vérifier si "users.csv" est présent dans le dossier du script
             $ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
             $DefaultCsvPath = "$ScriptPath\users.csv"
 
@@ -89,25 +117,21 @@ do {
             $DryRun = Read-Host "Exécuter en mode simulation ? (oui/non)"
             $DryRun = $DryRun -match "[Oo]"
 
-            # Mot de passe par défaut
             $defaultPassword = "P@ssw0rd123"
 
-            # Vérification du module ActiveDirectory
             if (-not (Get-Module -ListAvailable -Name ActiveDirectory)) {
-                Write-Host "Le module ActiveDirectory n'est pas installé."
+                Write-Host "Le module Active Directory n'est pas installé." -ForegroundColor Red
                 exit 1
             }
             Import-Module ActiveDirectory
 
-            # Vérifier l'existence du fichier CSV
             if (-not (Test-Path $CsvPath)) {
-                Write-Host "Le fichier CSV spécifié n'existe pas."
+                Write-Host "Le fichier CSV spécifié n'existe pas." -ForegroundColor Red
                 exit 1
             }
 
             $users = Import-Csv -Path $CsvPath
 
-            # Afficher les utilisateurs
             Write-Host "Utilisateurs à créer :"
             $users | ForEach-Object { Write-Host "$($_.FirstName) $($_.LastName)" }
 
@@ -125,10 +149,10 @@ do {
                 $password = ConvertTo-SecureString -AsPlainText $defaultPassword -Force
                 $fullName = "$firstName $lastName"
 
-                $existingUser = Get-ADUser -Filter {SamAccountName -eq $username} -ErrorAction SilentlyContinue
+                $existingUser = Get-ADUser -Filter "SamAccountName -eq '$username'" -ErrorAction SilentlyContinue
 
                 if ($existingUser) {
-                    Write-Host "L'utilisateur $username existe déjà."
+                    Write-Host "L'utilisateur $username existe déjà." -ForegroundColor Yellow
                 } else {
                     if ($DryRun) {
                         Write-Host "[Simulation] Création de : $fullName ($username) avec email : $email dans l'OU : $TargetOU"
@@ -144,12 +168,11 @@ do {
                                 -EmailAddress $email `
                                 -AccountPassword $password `
                                 -Enabled $true `
-                                -PassThru `
                                 -Path $TargetOU
 
-                            Write-Host "Utilisateur $fullName créé avec succès."
+                            Write-Host "Utilisateur $fullName créé avec succès." -ForegroundColor Green
                         } catch {
-                            Write-Host "Erreur lors de la création de $fullName."
+                            Write-Host "Erreur lors de la création de $fullName. Détails : $_" -ForegroundColor Red
                         }
                     }
                 }

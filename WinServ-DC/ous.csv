@@ -1,7 +1,7 @@
 OUName,ParentOU
-EXAMPLE,DC=example,DC=com
-PERSONNEL,OU=EXAMPLE,DC=example,DC=com
-SERVICE,OU=EXAMPLE,DC=example,DC=com
-IT,OU=SERVICE,OU=EXAMPLE,DC=example,DC=com
-HR,OU=SERVICE,OU=EXAMPLE,DC=example,DC=com
-Finance,OU=SERVICE,OU=EXAMPLE,DC=example,DC=com
+FR1,"DC=example,DC=local"
+PERSONNEL,"OU=FR1,DC=example,DC=local"
+SERVICE,"OU=FR1,DC=example,DC=local"
+IT,"OU=SERVICE,OU=FR1,DC=example,DC=local"
+HR,"OU=SERVICE,OU=FR1,DC=example,DC=local"
+Finance,"OU=SERVICE,OU=FR1,DC=example,DC=local"

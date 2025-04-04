@@ -1,3 +1,4 @@
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 # Demande les informations de base
 $NewComputerName = Read-Host "Entrez le nouveau nom du poste (laisser vide pour ne pas changer)"
 $JoinDomain = Read-Host "Voulez-vous rejoindre un domaine ? (O/N)"

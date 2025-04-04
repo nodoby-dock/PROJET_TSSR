@@ -1,3 +1,4 @@
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 # Définition du chemin du raccourci de démarrage automatique
 $StartupPath = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\server_setup.lnk"
 

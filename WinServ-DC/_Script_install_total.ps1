@@ -1,11 +1,10 @@
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 # Définition du chemin du raccourci de démarrage automatique
 $StartupPath = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\server_setup.lnk"
 
 # Vérifier si le script est déjà en auto-lancement et le configurer si nécessaire
 if (-not (Test-Path $StartupPath)) {
     Write-Host "Configuration du script pour qu'il démarre automatiquement..."
-    
+
     # Création d'un raccourci vers le script dans le dossier de démarrage
     $WScriptShell = New-Object -ComObject WScript.Shell
     $Shortcut = $WScriptShell.CreateShortcut($StartupPath)
@@ -13,7 +12,7 @@ if (-not (Test-Path $StartupPath)) {
     $Shortcut.Arguments = "-ExecutionPolicy Bypass -File `"$PSCommandPath`""
     $Shortcut.WorkingDirectory = "$PSScriptRoot"
     $Shortcut.Save()
-    
+
     Write-Host "Le script démarrera automatiquement au prochain redémarrage."
 }
 

@@ -6,22 +6,22 @@ Un accès administrateur sur le serveur.
 PowerShell.
 Une connexion Internet pour télécharger les scripts
 ## Importer ce repo 
-Créer le dossier "Script" à la racine de C:/ et dans powershell entrer la commande suivante : 
+Créer le dossier "Scripts" à la racine de C:/ et dans powershell entrer la commande suivante : 
 ```
 $repo = "nodoby-dock/PROJET_TSSR"
->> $zipUrl = "https://github.com/$repo/archive/refs/heads/main.zip"
->> $zipFile = "projet-test.zip"
->> $destinationPath = "C:/Scripts/projet-test"
->>
->> # Supprime le dossier s'il existe
->> Remove-Item -Path $destinationPath -Recurse -Force -ErrorAction SilentlyContinue
->>
->> # Télécharge et extrait l'archive
->> Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
->> Expand-Archive -Path $zipFile -DestinationPath $destinationPath -Force
->>
->> # Supprime l'archive ZIP
->> Remove-Item -Path $zipFile -Force 
+ $zipUrl = "https://github.com/$repo/archive/refs/heads/main.zip"
+ $zipFile = "projet-test.zip"
+ $destinationPath = "C:/Scripts/projet-test"
+
+ # Supprime le dossier s'il existe
+ Remove-Item -Path $destinationPath -Recurse -Force -ErrorAction SilentlyContinue
+
+ # Télécharge et extrait l'archive
+ Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
+ Expand-Archive -Path $zipFile -DestinationPath $destinationPath -Force
+
+ # Supprime l'archive ZIP
+ Remove-Item -Path $zipFile -Force 
 ```
 # *WinServ-DC* ⚙️
 ## L'outil parfait pour installer et populate un DC
